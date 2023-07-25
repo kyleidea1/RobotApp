@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,11 +43,8 @@ data class ClickableLine(
     override val stopX: Float,
     override val stopY: Float,
     override var isEnabled: Boolean = true,
-    val initialIsDotted: Boolean = false,
+    var initialIsDotted: Boolean = false,
 ) : Line(startX, startY, stopX, stopY, isEnabled)
-
-
-
 
 data class UnclickableLine(
     override val startX: Float,
@@ -65,7 +63,6 @@ fun DrawLines(lines: List<Line>) {
         }
     }
 }
-
 
 @Composable
 fun DrawUnclickableLine(line: UnclickableLine) {
@@ -134,6 +131,27 @@ fun DrawClickableLine(line: ClickableLine) {
     }
 }
 
+class ClickableLineGroup(val lines: List<ClickableLine>) {
+    var isDotted = false
+        private set
+
+    fun toggleDotted() {
+        isDotted = !isDotted
+        lines.forEach { it.initialIsDotted = isDotted }
+    }
+}
+
+@Composable
+fun DrawClickableLineGroup(lineGroup: ClickableLineGroup) {
+    lineGroup.lines.forEach { line ->
+        DrawClickableLine(line)
+    }
+    // Update 'initialIsDotted' when lineGroup.isDotted changes
+    DisposableEffect(lineGroup.isDotted) {
+        lineGroup.lines.forEach { it.initialIsDotted = lineGroup.isDotted }
+        onDispose { }
+    }
+}
 
 
 fun parseUData(pathData: String): UnclickableLine {
@@ -149,17 +167,29 @@ fun parseUData(pathData: String): UnclickableLine {
 }
 
 fun parseCData(pathData: String): ClickableLine {
-    val points = pathData.substring(1).split('L').flatMap { it.split(',') }.map { it.toFloat() }
+    val points = pathData.substring(1).split('L', 'H').flatMap { it.split(',') }.map { it.toFloat() }
 
-    return ClickableLine(
-        startX = points[0],
-        startY = points[1],
-        stopX = points[2],
-        stopY = points[3],
-        initialIsDotted = false,
-        isEnabled = true,
-    )
+    if (pathData.contains('L')) {
+        return ClickableLine(
+            startX = points[0],
+            startY = points[1],
+            stopX = points[2],
+            stopY = points[3],
+            initialIsDotted = false,
+            isEnabled = true,
+        )
+    } else { // 'H' case
+        return ClickableLine(
+            startX = points[0],
+            startY = points[1],
+            stopX = points[2],
+            stopY = points[1], // For 'H', y coordinate remains the same
+            initialIsDotted = false,
+            isEnabled = true,
+        )
+    }
 }
+
 
 @Composable
 fun CreateLineList(): List<Line> {
@@ -177,6 +207,10 @@ fun CreateLineList(): List<Line> {
     val RVL2: ClickableLine = parseCData("C1418.3,366.1L1418.3,1052.7")//7
     val rightPanelHorizontal: UnclickableLine = parseUData("U1883.2,678.2L1883.2,1364.7")
     val RBK1: ClickableLine = parseCData("C1419.2,0L1419.2,366.1")//5
+    val LCP01: ClickableLine = parseCData("C1133,787H1411.4")
+    val LCP02: ClickableLine = parseCData("C1133.4,787L1133,1042")
+    val RCP01: ClickableLine = parseCData("C475,787H753.4")
+    val RCP02: ClickableLine = parseCData("C753.4,787L753,1042")
 
     val lineList: List<Line> = listOf(
         leftBracketDiagonal,
@@ -192,7 +226,11 @@ fun CreateLineList(): List<Line> {
         rightPanelBottom,
         RVL2,
         rightPanelHorizontal,
-        RBK1
+        RBK1,
+        LCP01,
+        LCP02,
+        RCP01,
+        RCP02
     )
     return lineList
 }

@@ -246,31 +246,3 @@ fun CreateInputBoxes() {
         onLegLengthChange = { legLength -> rightCollarBox.legLength = legLength }
     )
 }
-
-
-
-
-//    val leftVerticalBox = CreateInputBox(lineList[1], 340, 100, 0, 6, false, "좌수직")
-//    val leftHorizontalBox = CreateInputBox(lineList[3], 40, 400, 0, 6, false, "좌수평")
-//    val leftLongiBox = CreateInputBox(lineList[5], 340, 400, 0, 6, false, "좌론지")
-//    val leftCollarBox = CreateInputBox(lineList[5], 340, 600, 0, 6, false,"좌칼라")
-//    val horizontalBox = CreateInputBox(lineList[7],530, 730, 0, 6, false, "수평")
-//    val rightVerticalBox = CreateInputBox(lineList[9], 780, 100, 0, 6, false, "우수직")
-//    val rightHorizontalBox = CreateInputBox(lineList[11], 990, 400, 0, 6, false, "우수평")
-//    val rightLongiBox = CreateInputBox(lineList[13], 780, 400, 0, 6, false, "우론지")
-//    val rightCollarBox = CreateInputBox(lineList[13], 780, 100, 0, 6, false, "우칼라")
-
-//    val inputBoxList : List<InputBox> = listOf(
-//        leftVerticalBox,
-//        leftHorizontalBox,
-//        leftLongiBox,
-//        leftCollarBox,
-//        horizontalBox,
-//        rightVerticalBox,
-//        rightHorizontalBox,
-//        rightLongiBox,
-//        rightCollarBox
-//    )
-//
-//    return inputBoxList
-//}
