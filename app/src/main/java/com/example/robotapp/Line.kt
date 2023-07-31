@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -42,7 +43,7 @@ data class ClickableLine(
     override val stopX: Float,
     override val stopY: Float,
     override var isEnabled: Boolean = true,
-    val initialIsDotted: Boolean = false,
+    val isDotted: MutableState<Boolean>
 ) : Line(startX, startY, stopX, stopY, isEnabled)
 
 
@@ -60,11 +61,12 @@ data class UnclickableLine(
 fun DrawLines(lines: List<Line>) {
     lines.forEach { line ->
         when (line) {
-            is ClickableLine -> DrawClickableLine(line)
+            is ClickableLine -> DrawClickableLine(line, line.isDotted)
             is UnclickableLine -> DrawUnclickableLine(line)
         }
     }
 }
+
 
 
 @Composable
@@ -85,12 +87,10 @@ fun DrawUnclickableLine(line: UnclickableLine) {
 }
 
 @Composable
-fun DrawClickableLine(line: ClickableLine) {
+fun DrawClickableLine(line: ClickableLine, isDotted: MutableState<Boolean>) {
     val density = LocalDensity.current
     val distance = sqrt((line.stopX.toDouble() - line.startX.toDouble()).pow(2) + (line.stopY.toDouble() - line.startY.toDouble()).pow(2)).toFloat()
     val angle = atan2(line.stopY.toDouble() - line.startY.toDouble(), line.stopX.toDouble() - line.startX.toDouble()) * (180 / PI).toFloat()
-
-    val isDotted = remember { mutableStateOf(line.initialIsDotted) }
 
     Box(
         Modifier
@@ -134,10 +134,13 @@ fun DrawClickableLine(line: ClickableLine) {
     }
 }
 
-
-
 fun parseUData(pathData: String): UnclickableLine {
-    val points = pathData.substring(1).split('L').flatMap { it.split(',') }.map { it.toFloat() }
+    val points = if (pathData.contains('H')) {
+        val temp = pathData.substring(2).split('H').flatMap { it.split(',') }.map { it.toFloat() }
+        listOf(temp[0], temp[1], temp[2], temp[1])
+    } else {
+        pathData.substring(2).split('L').flatMap { it.split(',') }.map { it.toFloat() }
+    }
 
     return UnclickableLine(
         startX = points[0],
@@ -148,51 +151,54 @@ fun parseUData(pathData: String): UnclickableLine {
     )
 }
 
-fun parseCData(pathData: String): ClickableLine {
-    val points = pathData.substring(1).split('L').flatMap { it.split(',') }.map { it.toFloat() }
+fun parseCData(pathData: String, isDotted: MutableState<Boolean>): ClickableLine {
+    val points = if (pathData.contains('H')) {
+        val temp = pathData.substring(2).split('H').flatMap { it.split(',') }.map { it.toFloat() }
+        listOf(temp[0], temp[1], temp[2], temp[1])
+    } else {
+        pathData.substring(2).split('L').flatMap { it.split(',') }.map { it.toFloat() }
+    }
 
     return ClickableLine(
         startX = points[0],
         startY = points[1],
         stopX = points[2],
         stopY = points[3],
-        initialIsDotted = false,
         isEnabled = true,
+        isDotted = isDotted
     )
 }
 
+
+
+
 @Composable
 fun CreateLineList(): List<Line> {
-    val leftBracketDiagonal: UnclickableLine = parseUData("U3.7,681.3L464.8,3.4")
-    val LBK0: ClickableLine = parseCData("C9.6,686.2L476.3,361.5")//1
-    val leftPanelBottom: UnclickableLine = parseUData("U16.2,1361.2L474.1,1041.7")
-    val LVL2: ClickableLine = parseCData("C468.2,366.1L468.2,1052.7")//2
-    val leftPanelHorizontal: UnclickableLine = parseUData("U6.8,678.2L6.8,1364.7")
-    val LBK1: ClickableLine = parseCData("C467.3,0L467.3,366.1")//0
-    val upperHorizontal: UnclickableLine = parseUData("U463.2,361.1L1412.6,361.1")
-    val CHF0: ClickableLine = parseCData("C461.4,1047.7L1410.8,1047.7")//4
-    val rightBracketDiagonal: UnclickableLine = parseUData("U1886.3,681.3L1425.2,3.4")
-    val RBK0: ClickableLine = parseCData("C1880.4,682.7L1413.7,357.9")//6
-    val rightPanelBottom: UnclickableLine = parseUData("U1871.6,1357L1413.7,1037.6")
-    val RVL2: ClickableLine = parseCData("C1418.3,366.1L1418.3,1052.7")//7
-    val rightPanelHorizontal: UnclickableLine = parseUData("U1883.2,678.2L1883.2,1364.7")
-    val RBK1: ClickableLine = parseCData("C1419.2,0L1419.2,366.1")//5
+    val leftBracketDiagonal: UnclickableLine = parseUData("UM3.7,681.3L464.8,3.4")
+    val LBK0: ClickableLine = parseCData("CM9.6,686.2L476.3,361.5", remember { mutableStateOf(false) })
+    val leftPanelBottom: UnclickableLine = parseUData("UM16.2,1361.2L474.1,1041.7")
+    val LVL2: ClickableLine = parseCData("CM468.2,366.1L468.2,1052.7", remember { mutableStateOf(false) })
+    val leftPanelHorizontal: UnclickableLine = parseUData("UM6.8,678.2L6.8,1364.7")
+    val LBK1: ClickableLine = parseCData("CM467.3,0L467.3,366.1", remember { mutableStateOf(false) })
+    val upperHorizontal: UnclickableLine = parseUData("UM463.2,361.1L1412.6,361.1")
+    val CHF0: ClickableLine = parseCData("CM461.4,1047.7L1410.8,1047.7", remember { mutableStateOf(false) })
+    val rightBracketDiagonal: UnclickableLine = parseUData("UM1886.3,681.3L1425.2,3.4")
+    val RBK0: ClickableLine = parseCData("CM1880.4,682.7L1413.7,357.9", remember { mutableStateOf(false) })
+    val rightPanelBottom: UnclickableLine = parseUData("UM1871.6,1357L1413.7,1037.6")
+    val RVL2: ClickableLine = parseCData("CM1418.3,366.1L1418.3,1052.7", remember { mutableStateOf(false) })
+    val rightPanelHorizontal: UnclickableLine = parseUData("UM1883.2,678.2L1883.2,1364.7")
+    val RBK1: ClickableLine = parseCData("CM1419.2,0L1419.2,366.1", remember { mutableStateOf(false) })
 
-    val lineList: List<Line> = listOf(
-        leftBracketDiagonal,
-        LBK0,
-        leftPanelBottom,
-        LVL2,
-        leftPanelHorizontal,
-        LBK1,
-        upperHorizontal,
-        CHF0,
-        rightBracketDiagonal,
-        RBK0,
-        rightPanelBottom,
-        RVL2,
-        rightPanelHorizontal,
-        RBK1
+    val isDottedLCP = remember { mutableStateOf(false) }
+    val LCP1: ClickableLine = parseCData("CM1133,787H1411.4", isDottedLCP)
+    val LCP2: ClickableLine = parseCData("CM1133.4,787L1133,1042", isDottedLCP)
+    val isDottedRCP = remember { mutableStateOf(false) }
+    val RCP1: ClickableLine = parseCData("CM475,787H753.4", isDottedRCP)
+    val RCP2: ClickableLine = parseCData("CM753.4,788L753,1043", isDottedRCP)
+
+    return listOf(
+        leftBracketDiagonal, LBK0, leftPanelBottom, LVL2, leftPanelHorizontal, LBK1,
+        upperHorizontal, CHF0, rightBracketDiagonal, RBK0, rightPanelBottom, RVL2,
+        rightPanelHorizontal, RBK1, LCP1, LCP2, RCP1, RCP2
     )
-    return lineList
 }
