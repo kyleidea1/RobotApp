@@ -24,6 +24,12 @@ data class InputBox(
     var name: String
 )
 
+object CheckBoxState {
+    var var1: Int = 0
+    var var2: Int = 0
+    var var3: Int = 0
+}
+
 @Composable
 fun RenderInputBox(
     box: InputBox,
@@ -145,6 +151,9 @@ fun CreateInputBoxes() {
     )
 
     val leftHorizontalBox = createInputBox(lineList[3], 40, 400, 0, 7, false, "좌수평")
+    val leftHorizontalChecked = remember { mutableStateOf(false) }
+    CheckBoxState.var1 = if (leftHorizontalChecked.value) 1 else 0
+
     RenderInputBox(
         box = leftHorizontalBox,
         x = 40,
@@ -182,6 +191,8 @@ fun CreateInputBoxes() {
     )
 
     val horizontalBox = createInputBox(lineList[7], 530, 730, 0, 7, false, "수평")
+    val horizontalChecked = remember { mutableStateOf(false) }
+
     RenderInputBox(
         box = horizontalBox,
         x = 530,
@@ -210,6 +221,9 @@ fun CreateInputBoxes() {
     )
 
     val rightHorizontalBox = createInputBox(lineList[11], 990, 400, 0, 7, false, "우수평")
+    val rightHorizontalChecked = remember { mutableStateOf(false) }
+    CheckBoxState.var3 = if (rightHorizontalChecked.value) 1 else 0
+
     RenderInputBox(
         box = rightHorizontalBox,
         x = 990,
@@ -246,31 +260,3 @@ fun CreateInputBoxes() {
         onLegLengthChange = { legLength -> rightCollarBox.legLength = legLength }
     )
 }
-
-
-
-
-//    val leftVerticalBox = CreateInputBox(lineList[1], 340, 100, 0, 6, false, "좌수직")
-//    val leftHorizontalBox = CreateInputBox(lineList[3], 40, 400, 0, 6, false, "좌수평")
-//    val leftLongiBox = CreateInputBox(lineList[5], 340, 400, 0, 6, false, "좌론지")
-//    val leftCollarBox = CreateInputBox(lineList[5], 340, 600, 0, 6, false,"좌칼라")
-//    val horizontalBox = CreateInputBox(lineList[7],530, 730, 0, 6, false, "수평")
-//    val rightVerticalBox = CreateInputBox(lineList[9], 780, 100, 0, 6, false, "우수직")
-//    val rightHorizontalBox = CreateInputBox(lineList[11], 990, 400, 0, 6, false, "우수평")
-//    val rightLongiBox = CreateInputBox(lineList[13], 780, 400, 0, 6, false, "우론지")
-//    val rightCollarBox = CreateInputBox(lineList[13], 780, 100, 0, 6, false, "우칼라")
-
-//    val inputBoxList : List<InputBox> = listOf(
-//        leftVerticalBox,
-//        leftHorizontalBox,
-//        leftLongiBox,
-//        leftCollarBox,
-//        horizontalBox,
-//        rightVerticalBox,
-//        rightHorizontalBox,
-//        rightLongiBox,
-//        rightCollarBox
-//    )
-//
-//    return inputBoxList
-//}
