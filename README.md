@@ -1,4 +1,4 @@
-<img width="859" alt="image" src="https://github.com/kyleidea1/RobotApp/assets/99781357/9da9b497-afa9-4b8a-946e-22a41a0e10c4">### 간단한 연락처 애플리케이션
+### 간단한 연락처 애플리케이션
 
 ---
 
