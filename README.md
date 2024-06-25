@@ -1,4 +1,4 @@
-### 간단한 연락처 애플리케이션
+<img width="859" alt="image" src="https://github.com/kyleidea1/RobotApp/assets/99781357/9da9b497-afa9-4b8a-946e-22a41a0e10c4">### 간단한 연락처 애플리케이션
 
 ---
 
@@ -11,8 +11,8 @@
    - **이름** (필수): TextField
    - **전화번호** (필수): TextField
    - **이메일** (선택): TextField
-   - **더보기 버튼** (드롭다운, 확장 시 생일, 성별, 메모 폼 등장)
-     - **생일** (선택): Kotlin 내장 캘린더 이용, 날짜 클릭 가능
+   - **더보기 버튼** (클릭 시 확장. 생일, 성별, 메모 폼 등장): Button
+     - **생일** (선택): DatePickerDialog
      - **성별** (선택): Radio Button
      - **메모** (선택): TextField
 
